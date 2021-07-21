@@ -1,0 +1,396 @@
+<template>
+  <the-page>
+    <transition name="slide" mode="out-in">
+      <div v-if="!infoPageVisible">
+        <div class="formBox topForm">
+          <x-collapse-card title="员工信息" :default-visible="false" style="margin-bottom: 20px;">
+            <el-form ref="form" :model="form" label-width="120px" size="small">
+
+              <el-row :gutter="20">
+                <el-col :span="6">
+                  <el-form-item label="部门名称" prop="deptId">
+                    <el-select v-model="form.deptId" clearable>
+                      <el-option 
+                      :label="option.deptName" 
+                      :value="option.deptId"
+                      v-for="(option,index) in selectData.deptNameList" 
+                      :key="index">
+                      </el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="员工编码" prop="employeeCode">
+                    <el-input :maxlength="20" v-model="form.employeeCode"></el-input> 
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="员工名称" prop="employeeName">
+                    <el-input :maxlength="20" v-model="form.employeeName"></el-input>
+                  </el-form-item> 
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="职务" prop="title">
+                    <el-input :maxlength="20" v-model="form.title"></el-input>
+                  </el-form-item> 
+                </el-col>
+              </el-row>
+
+              <el-row :gutter="20">
+                <el-col :span="6">
+                  <el-form-item label="员工状态" prop="employeeStatus">
+                    <x-filter-select
+                      v-model="form.employeeStatus"
+                      :list="localDataSource.employeeStatus"
+                    ></x-filter-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              
+              <el-row style="text-align: right">
+                <el-button @click="getData" type="primary" size="small">搜索</el-button>
+                <el-button @click="resetForm" type="defalut" size="small">清除</el-button>
+              </el-row>
+            </el-form>
+          </x-collapse-card>
+        </div>
+        <table-card
+          ref="tableCard"
+          class="x-table-card--normal"
+          border
+          stripe
+          size="small"
+          :extraBtns="btnGroup"
+          @extraBtnAction="handleToolBtnClick"
+          @currentChange="handleCurrentChange"
+          btnGroup="refresh,delete"
+          row-class-name="text-center"
+          header-cell-class-name="text-center"
+          actionColumnWidth="80"
+          :columns="columns"
+          :getList="fetchData"
+          height="360">
+        </table-card>
+      </div>
+    </transition>
+    <transition name="slide" mode="out-in">
+      <purchase-info
+        @handleCancel="infoPageVisible = false"
+        v-if="infoPageVisible"
+        :oid="infoOid"
+        :optype="optype"
+      ></purchase-info>
+    </transition>
+  </the-page>
+</template>
+<script>
+import PurchaseInfo from "./PurchaseInfo";
+import XCollapseCard from '@/components/XCollapseCard'
+import localDataSource from './localDataSource';
+
+export default {
+  name: "Purchase",
+  components: {
+    PurchaseInfo,
+    XCollapseCard
+  },
+  data() {
+    const h = this.$createElement;
+    return {
+        localDataSource:localDataSource,
+        // 选项框select
+      selectData: {
+        type: Object,
+        defalut: () => ({
+          deptNameList: {type: Array, defalut: () => ([]) }, //部门名称
+        })
+      },
+        form: {
+        // 用户管理
+        deptId:"",
+        employeeCode: "",
+        employeeName: "",
+        employeeStatus: "",
+        title: "",
+      },
+      infoPageVisibleKey: "",
+      optype: "add",
+      infoOid: "",
+      infoPageVisible: false,
+      btnGroup: [
+        { key: "View", label: "查阅", type: "primary", icon: "el-icon-view" },
+        { key: "Update", label: "修改", type: "primary", icon: "el-icon-edit" },
+        { key: "Add", label: "新增", type: "primary", icon: "el-icon-plus" }
+      ],
+      columns: [
+        {
+          label: "行号",
+          type: "index",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "itemName",
+          label: "项目名称",
+          minWidth: "80",
+          align: "center"
+        },
+        {
+          prop: "itemType",
+          label: "项目类型",
+          minWidth: "150",
+          align: "center",
+          formatter(row){ return row.itemType === '1' ? "kpi" : "kpa" }
+        },
+        {
+          prop: "content",
+          label: "考核内容",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "weight",
+          label: "分值",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "assessmentType",
+          label: "类型",
+          minWidth: "150",
+          align: "center",
+          formatter(row){ return row.assessmentType === '1' ? "公司共用" 
+          : row.assessmentType === '2' ? "部门共用" : row.assessmentType === '3' ? "岗位共用" : "临时共用"}
+        },
+        {
+          prop: "assessmentMode",
+          label: "计算方式",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "description",
+          label: "项目界定/指标说明",
+          minWidth: "150",
+          align: "center"
+        },
+
+        {
+          prop: "remark",
+          label: "备注",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "dataSource",
+          label: "数据来源",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "createBy",
+          label: "创建人",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "createTime",
+          label: "创建时间",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "updateBy",
+          label: "更新人",
+          minWidth: "150",
+          align: "center"
+        },
+        {
+          prop: "updateTime",
+          label: "更新时间",
+          minWidth: "150",
+          align: "center"
+        }
+      ],
+      rowData: {}
+    };
+  },
+  methods: {
+    // fetchData: getAssessmentStandardList,
+    fetchData() {
+      return new Promise(resolve => {
+        resolve({
+          data: [
+            {
+              assessmentId: "1",
+              serialNo: 11,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 57,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            },
+            {
+              assessmentId: "2",
+              serialNo: 12,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 55,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            },
+            {
+              assessmentId: "3",
+              serialNo: 13,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 53,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            },
+            {
+              assessmentId: "4",
+              serialNo: 14,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 54,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            },
+            {
+              assessmentId: "5",
+              serialNo: 15,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 51,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            },
+            {
+              assessmentId: "6",
+              serialNo: 16,
+              itemName: "长江三峡水坝修建",
+              itemType: "建筑工程",
+              content: "是否漏水",
+              weight: 52,
+              assessmentType: "类型",
+              assessmentMode: "计算方式/交付要求",
+              description: "项目界定/指标说明",
+              remark: "备注",
+              dataSource: "数据来源",
+              createBy: "创建人",
+              createTime: "创建时间",
+              updateBy: "更新人",
+              updateTime: "更新时间"
+            }
+          ],
+          meta: {
+            status: "200",
+            msg: "success"
+          }
+        });
+      });
+    },
+    // deleteData: delAssessmentStandard,
+    getData() {
+      this.$refs.tableCard.query();
+    },
+    resetForm() {
+      this.$refs.form.resetFields();
+    },
+    // 新增
+    showInfoPage(key) {
+      if (key !== "Add") {
+        if (this.rowData.oid) {
+          this.infoOid = this.rowData.oid;
+        } else {
+          this.$message({
+            type: "warning", 
+            message: "请选择一条数据"
+          });
+          return;
+        }
+      } else {
+        this.infoOid = "";
+      }
+      this.optype = key;
+      this.infoPageVisibleKey = new Date().getTime();
+      this.infoPageVisible = true;
+    },
+    // 修改
+    handleUpdate() {
+      this.optype = "edit";
+      this.infoPageVisible = true;
+    },
+    handleToolBtnClick(key) {
+      this.showInfoPage(key);
+    },
+    handleCurrentChange(row) {
+      this.rowData = row;
+    }
+  },
+  // 缓存触发时对table重排避免布局错乱bug
+  activated() {
+    if (this.$refs.tableCard) {
+      this.$refs.tableCard.doLayout();
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+.success-span {
+  color: #67c23a;
+}
+.danger-span {
+  color: #f56c6c;
+}
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.5s;
+}
+.slide-enter,
+.slide-leave-active {
+  opacity: 0;
+  transform: translate3d(20px, 0, 0);
+}
+</style>

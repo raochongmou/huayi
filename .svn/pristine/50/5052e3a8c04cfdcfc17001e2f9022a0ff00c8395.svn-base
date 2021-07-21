@@ -1,0 +1,9 @@
+.btn-list {
+    float: right;
+    align-self: flex-end;
+    align-content: flex-end;
+    margin-right: 30px;
+    padding-left: 30px;
+}
+
+// 基础的button List 框架

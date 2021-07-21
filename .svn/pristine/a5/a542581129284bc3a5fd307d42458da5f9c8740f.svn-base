@@ -1,0 +1,362 @@
+<template>
+  <div class="formBox topForm infoPage">
+    <div class="formBox-title">
+      <span>{{infoTitle}}-</span>
+    </div>
+    <el-form
+      style="padding-bottom: 0;"
+      ref="infoForm"
+      :model="infoForm"
+      :rules="rules"
+      :disabled="infoType === 'View'"
+      label-width="100px"
+      size="small"
+    >
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-form-item label="项目名称" prop="itemName">
+            <el-input
+              :title="titles"
+              :onmouseover="titles=infoForm.itemName"
+              :maxlength="30"
+              v-model="infoForm.itemName"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="项目类型" prop="itemType">
+            <x-filter-select v-model="infoForm.itemType" :list="localDataSource.itemType"></x-filter-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="考核内容" prop="content">
+            <el-input
+              :title="titles3"
+              :onmouseover="titles3=infoForm.content"
+              :maxlength="30"
+              v-model="infoForm.content"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="分值" prop="weight">
+            <el-input :maxlength="30" v-model="infoForm.weight"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-form-item label="类型" prop="assessmentType">
+            <x-filter-select
+              v-model="infoForm.assessmentType"
+              :list="localDataSource.assessmentType"
+            ></x-filter-select>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="计算方式" prop="assessmentMode">
+            <el-input
+              :title="titles5"
+              :onmouseover="titles5=infoForm.assessmentMode"
+              :maxlength="30"
+              v-model="infoForm.assessmentMode"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="项目界定" prop="description">
+            <el-input
+              :title="titles6"
+              :onmouseover="titles6=infoForm.description"
+              :maxlength="30"
+              v-model="infoForm.description"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="备注" prop="remark">
+            <el-input :maxlength="30" v-model="infoForm.remark"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-form-item label="数据来源" prop="dataSource">
+            <el-input
+              :title="titles7"
+              :onmouseover="titles7=infoForm.dataSource"
+              :maxlength="30"
+              v-model="infoForm.dataSource"
+            ></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="创建人" prop="createBy">
+            <el-input disabled :maxlength="30" v-model="infoForm.createBy"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="创建时间" prop="createTime">
+            <el-input disabled :maxlength="30" v-model="infoForm.createTime"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <el-form-item label="更新时间" prop="updateTime">
+            <el-input disabled :maxlength="30" v-model="infoForm.updateTime"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+
+      <el-row :gutter="20">
+        <el-col :span="6" v-if="infoType !== 'Add'">
+          <el-form-item label="更新人" prop="updateBy">
+            <el-input disabled :maxlength="30" v-model="infoForm.updateBy"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
+
+    <el-row style="text-align: center">
+      <el-button v-if="infoType !== 'View'" @click="handleSave" type="primary" size="small">保存</el-button>
+      <el-button @click="backList" type="defalut" size="small">返回</el-button>
+    </el-row>
+  </div>
+</template>
+<script>
+// import {
+//   updateAssessmentStandard,
+//   addAssessmentStandard,
+//   getAssessmentStandardInfo
+// } from "@/api/hr/hrAssessmentStandardController";
+// import {getTime} from "@/utils/getCurrentTime"
+import localDataSource from "./localDataSource";
+
+export default {
+  name: "PurchaseInfo",
+  props: {
+    oid: {
+      type: String,
+      default: ""
+    },
+    optype: {
+      type: String,
+      default: ""
+    }
+  },
+  data() {
+    return {
+      titles: "",
+      titles2: "",
+      titles3: "",
+      titles4: "",
+      titles5: "",
+      titles6: "",
+      titles7: "",
+      infoForm: {
+        assessmentId: null,
+        serialNo: null,
+        itemName: "",
+        itemType: "",
+        content: "",
+        weight: null,
+        assessmentType: "",
+        assessmentMode: "",
+        description: "",
+        remark: "",
+        dataSource: "",
+        createBy: "",
+        createTime: "",
+        updateBy: "",
+        updateTime: "",
+        oid: ""
+      },
+      infoType: this.optype,
+      rules: {},
+      stepList: [],
+      localDataSource: localDataSource
+    };
+  },
+  // created() {
+  //   this.infoForm["createTime"] = getTime();
+  //   this.infoForm["createBy"] = this.createPerson;
+  //   this.infoForm["updateBy"] = this.createPerson;
+  // },
+  computed: {
+    activeIndex() {
+      return this.stepList.length;
+    },
+    infoTitle() {
+      return { Add: "新增", Update: "修改", View: "查阅" }[this.infoType] || "";
+    },
+    // 获取当前用户真实名字
+    // createPerson() {
+    //   return this.$parent._routerRoot.$store.getters.realName;
+    // }
+  },
+  mounted() {
+    // this.getData();
+  },
+  methods: {
+    // 修改、查阅时获取数据
+    // getData() {
+    //   if (this.oid) {
+    //     this.stepList = [];
+    //     getAssessmentStandardInfo({ assessmentId: this.oid }).then(res => {
+    //       if (res.data) {
+    //         for (let key in this.infoForm) {
+    //           this.infoForm[key] = res.data[key];
+    //         }
+    //       }
+    //     });
+    //   }
+    // },
+    // 保存
+    // handleSave() {
+    //   this.$refs.infoForm.validate((valid, errorFiled) => {
+    //     if (valid) {
+    //       if (this.infoType === "Add") {
+    //         // 初始化 更新时间
+    //         this.infoForm['updateTime'] = getTime()
+    //         // 新增保存
+    //         addAssessmentStandard(this.infoForm).then(res => {
+    //           if (res) {
+    //             this.$message({
+    //               type: "success",
+    //               message: "保存成功"
+    //             });
+    //             for (let key in this.infoForm) {
+    //               this.infoForm[key] = res.data[key];
+    //             }
+    //             this.infoType = "edit";
+    //             this.oid = res.data.oid;
+    //           } else {
+    //             this.$message({
+    //               type: "error",
+    //               message: "保存失败!"
+    //             });
+    //           }
+    //         });
+    //       } else if (this.infoType === "Update") {
+    //         // 初始化 更新时间
+    //         this.infoForm['updateTime'] = getTime()
+    //         // 修改/保存
+    //         updateAssessmentStandard(this.infoForm).then(res => {
+    //           if (res.data) {
+    //             this.$message({
+    //               type: "success",
+    //               message: "修改成功!"
+    //             });
+    //             for (let key in this.infoForm) {
+    //               this.infoForm[key] = res.data[key];
+    //             }
+    //           } else {
+    //             this.$message({
+    //               type: "error",
+    //               message: "保存失败!"
+    //             });
+    //           }
+    //         });
+    //       }
+    //     }
+    //   });
+    // },
+    // 关闭弹窗清除表单清除验证
+    handleDialogMannagerClose() {
+      this.$refs.mannagerForm.clearValidate();
+    },
+    // 返回
+    backList() {
+      this.$emit("handleCancel", false);
+    }
+  }
+};
+</script>
+<style lang="scss" scoped>
+::v-deep {
+  .el-step__description.is-finish {
+    padding-right: 2% !important;
+  }
+}
+.infoPage {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 9;
+}
+
+.mannager-btns {
+  float: right;
+  margin-left: 10px;
+}
+
+.step-title-div {
+  .step-title-span {
+    line-height: 24px;
+    vertical-align: bottom;
+    display: inline-block;
+    margin-right: 16px;
+  }
+
+  .stepTitle {
+    font-size: 16px;
+    color: #333;
+    margin-right: 10px;
+  }
+
+  .stepNodeTitle {
+    font-size: 16px;
+    color: #409eff;
+    margin-right: 10px;
+  }
+
+  .el-button--mini {
+    padding: 4px 8px;
+  }
+}
+
+.mannager-box {
+  .label-span {
+    font-size: 14px;
+    display: inline-block;
+  }
+
+  .el-link {
+    margin-left: 10px;
+  }
+}
+
+.el-divider--horizontal {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.flowStep-box {
+  padding: 10px 40px 40px 40px;
+
+  .el-form {
+    padding: 0;
+  }
+}
+
+.empty-tip {
+  padding: 0 20px 20px 20px;
+}
+
+.label-div {
+  padding: 6px 0;
+
+  p {
+    margin: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: #666;
+    display: inline-block;
+    margin-right: 16px;
+    min-width: 70px;
+  }
+}
+</style>
