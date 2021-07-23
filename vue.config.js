@@ -18,14 +18,22 @@ const port = process.env.port || process.env.npm_config_port || 9527 // dev port
 // All configuration item explanations can be find in https://cli.vuejs.org/config/
 module.exports = {
   devServer: {
+    port: port,
+    open: true, 
+    // overlay: {
+    //   warnings: false,
+    //   errors: true
+    // },
+    //before: require('./mock/mock-server.js'),
     disableHostCheck: true,
     port: 8523,
     proxy: {
-      // http://47.111.225.184:9530/cfts-hy/user/login
-      '/api/cfts-hy/': {
+      '/api': {
+        changeOrigin: true, //允许跨域 
         target: 'http://47.111.225.184:9530',
-        pathRewrite: { '^/api/cfts-hy/': '/cfts-hy/' }
+        pathRewrite: { '^/api': '/cfts-hy' }
       },
+    
     },
   },
   publicPath: '/',
@@ -35,13 +43,7 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   // devServer: {
-  //   port: port,
-  //   open: true,
-  //   overlay: {
-  //     warnings: false,
-  //     errors: true
-  //   },
-  //   before: require('./mock/mock-server.js')
+ 
   // },
   configureWebpack: {
     name: name,

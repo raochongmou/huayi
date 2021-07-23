@@ -9,13 +9,13 @@
         <lang-select class="set-language" />
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
+          v-model="loginForm.userName"
           :placeholder="$t('login.username')"
           name="username"
           type="text"
@@ -25,14 +25,14 @@
       </el-form-item>
 
       <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
-        <el-form-item prop="password">
+        <el-form-item prop="passWord">
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
           <el-input
             :key="passwordType"
             ref="password"
-            v-model="loginForm.password"
+            v-model="loginForm.passWord"
             :type="passwordType"
             :placeholder="$t('login.password')"
             name="password"
@@ -104,10 +104,10 @@ export default {
       }
     }
     return {
-      loginForm: {"loginType":2,"loginName":"1","passWord":"1231"},
+      loginForm: {loginType:2,userName:"admin",passWord:"111111"},
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        userName: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        passWord: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -133,9 +133,9 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
+    if (this.loginForm.userName === '') {
       this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
+    } else if (this.loginForm.passWord === '') {
       this.$refs.password.focus()
     }
   },

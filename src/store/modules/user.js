@@ -7,7 +7,8 @@ const state = {
   name: '',
   avatar: '',
   introduction: '',
-  roles: []
+  roles: [],
+
 }
 
 const mutations = {
@@ -31,11 +32,10 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { loginType,loginName, password } = userInfo
+    const { userName, passWord, loginType } = userInfo
     return new Promise((resolve, reject) => {
-      login({ loginType: loginType,loginName: loginName.trim(), password: password }).then(response => {
+      login({ loginName: userName.trim(), passWord: passWord, loginType: loginType }).then(response => {
         const { data } = response
-        console.log(data);
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()

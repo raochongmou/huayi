@@ -4,7 +4,7 @@
     :header="title"
     :shadow="tight?'never': 'always'"
     :class="tight?'tight-box-card':''"
-  >
+  > 
     <!-- el-card-header -->
     <template slot="header">
       <slot name="header"></slot>

@@ -16,7 +16,8 @@ export function isExternal(path) {
  */
 export function validUsername(str) {
   const valid_map = ['1', 'editor']
-  return valid_map.indexOf(str.trim()) >= 0
+  // return valid_map.indexOf(str.trim()) >= 0
+  return true
 }
 
 /**

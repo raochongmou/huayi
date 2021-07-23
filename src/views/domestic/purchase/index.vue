@@ -226,18 +226,15 @@ export default {
     };
   },
   methods: {
-    //
-    // ...mapActions({
-    //   shows:'showTags'
-    // }),
+    
     // 双击列表item显示详情
-    rowDbclick(row, column, cell, event) {
+    rowDbclick(row, column, event) {
       this.infoPageVisible = true;
-      this.$store.dispatch('tagsView/showTags')
-      // this.$parent.$store.state.tagsView.showTag = true
-
-      // console.log(this.$parent.$store.state.tagsView.showTag);
+      // 合并数组到rowIdVal中
+      this.$store.dispatch('purchase/getRowIdVal',row.oid+'')
+      this.$store.dispatch('tagsView/showTags') 
     },
+
     // fetchData: getAssessmentStandardList,
     fetchData() {
       return new Promise(resolve => {

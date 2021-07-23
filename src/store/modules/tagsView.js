@@ -134,7 +134,7 @@ const actions = {
   },
 
   delAllViews({ dispatch, state }, view) {
-    return new Promise(resolve => {
+    return new Promise(resolve => { 
       dispatch('delAllVisitedViews', view)
       dispatch('delAllCachedViews', view)
       resolve({

@@ -48,7 +48,7 @@
     </el-form>
 
     <el-row style="text-align: center">
-      <el-button v-if="infoType !== 'View'" @click="handleSave" type="primary" size="small">保存</el-button>
+      <el-button v-if="infoType !== 'View'" type="primary" size="small">保存</el-button>
       <el-button @click="backList" type="defalut" size="small">返回</el-button>
     </el-row>
   </div>

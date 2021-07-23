@@ -12,7 +12,7 @@
         @click.middle.native="!isAffix(tag)?closeSelectedTag(tag):''"
         @contextmenu.prevent.native="openMenu(tag,$event)"
       >
-        {{ generateTitle(tag.title) }}333
+        {{ generateTitle(tag.title) }}
         <span
           v-if="!isAffix(tag)"
           class="el-icon-close"
@@ -20,7 +20,18 @@
         />
       </router-link>
       <!-- 面包屑后面的tags -->
-      <el-tag closable v-if="reShowTag">标签一</el-tag>
+      <!-- <el-tag closable v-if="reShowTag" @close="listClosed">标签一</el-tag> -->
+
+      <el-tag
+        :key="tag"
+        v-for="tag in dynamicTags"
+        closable
+        :disable-transitions="false"
+        @close="handleClose(tag)"
+        @click="clickVisibleList(tag)"
+      >{{'列表'+tag}}</el-tag>
+
+
     </scroll-pane>
     <ul v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
       <li @click="refreshSelectedTag(selectedTag)">{{ $t('tagsView.refresh') }}</li>
@@ -43,6 +54,9 @@ export default {
   components: { ScrollPane },
   data() {
     return {
+      // 动态生成标签栏
+      dynamicTags: [],
+      array1:[],
       // showTag:false,
       visible: false,
       top: 0,
@@ -76,12 +90,33 @@ export default {
     }
   },
   mounted() {
+    // console.log('this:',this.$parent.$store.state.purchase);
+    // console.log('组件:',this);
+    // this.$nextTick(
+    //   (this.dynamicTags = [...this.$parent.$store.state.purchase.rowIdVal])
+    // );
+    // this.dynamicTags = [...this.$parent.$store.state.purchase.rowIdVal];
+    // console.log('this:',this.$parent.$store.state.purchase.rowIdVal);
     this.initTags();
     this.addTags();
+    // console.log(this.getRowIdVal());
+    // this.array1 = this.array1.push(this.$store.state.purchase.rowIdVal)
+    this.dynamicTags = this.$store.state.purchase.rowIdVal
   },
   methods: {
+    clickVisibleList(tag) {
+      console.log('clickVisibleList',tag);
+    },
+    // 处理tag关闭事件函数
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    // 点击el-tag标签的关闭按钮,关闭当前列表页面
+    listClosed() {
+      !this.reShowTag();
+    },
     clickBtn() {
-      this.$store.commit('SHOWTAG')
+      this.$store.commit("SHOWTAG");
     },
     generateTitle, // generateTitle by vue-i18n
     isActive(route) {
@@ -301,6 +336,9 @@ export default {
   margin-left: 5px !important;
   margin-top: 4px !important;
   border-radius: 0% !important;
+}
+.el-tag + .el-tag {
+  margin-left: 10px;
 }
 </style>
 
